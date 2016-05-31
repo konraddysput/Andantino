@@ -41,7 +41,6 @@ gulp.task('styles', function(){
 
 
 gulp.task('typescript',function(){
-console.log('typescript compile');
 	return gulp.src('Scripts/Build/*.ts')
 				.pipe(ts({
 					noImplicitAny: true,

@@ -15,6 +15,15 @@ Konrad Dysput
 ###How to run?
 Open file index.html
 
+###Requirements
+* gulp* 
+* SASS compiller*
+* typescript compiler*
+
+Warning:
+All requirements with * are not necessary to run project from github. If you want to change scripts/styles you should have these requirements. 
+
 ###Contact
 For more information contact me via e-mail:
 * konrad.dysput@gmail.com
+

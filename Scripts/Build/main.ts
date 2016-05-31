@@ -1,5 +1,6 @@
 ///<reference path="Game.ts" />
 ///<reference path="GameStatus.ts" />
+///<reference path="NodeStatus.ts" />
 ///<reference path="Enviroment.ts" />
 ///<reference path='../../lib/jquery.d.ts' />
  module MainView{
@@ -8,11 +9,26 @@
  	})
 	var USERNAME = "",
 		CURRENTRELAY=0,
-		BOARDSIZE = 11;
+		BOARDSIZE = 11,
+		hostAddress = "http://localhost:18080/submitResult/"
 	declare var CURRENTGAME:GameLogic.Game;
 
 	export function getCurrentRelay(){
 		return CURRENTRELAY;
+	}
+
+	export function PerformMove(move: any) {
+		if (move.winner != 0){
+			CURRENTGAME.EndGame();
+			Enviroment.EndGame(move.winner);
+			return true;
+		}
+		if(move.x%2==1){
+			move.x = move.x- 1;
+		}
+		move.x = move.x / 2;
+		CURRENTGAME.SetAIMove(move.y, move.x);
+		$("#move-information").slideToggle();
 	}
 
 	export function nextRound(){
@@ -31,7 +47,7 @@
 		if(!gameType){
 			status = GameLogic.GameStatus.playerVsBot;
 		}
-		CURRENTGAME = new GameLogic.Game(BOARDSIZE, status);
+		CURRENTGAME = new GameLogic.Game(BOARDSIZE, status, hostAddress);
 	}
 
 	function beginGame(){
@@ -56,14 +72,13 @@
 
 	function prepareForm() {
 		createBoard();
-		hidePools();
 		Enviroment.setCheckBoxFunctions();
 	}
 
 	function createBoard(){
 		var verticalIndex = 0;
 		for (verticalIndex; verticalIndex < BOARDSIZE; verticalIndex++) {
-			$("#game-content").append("<div class='row'></div>");
+			$("#game-content").append("<div class='row board'></div>");
 			for (var horizontalIndex = 0; horizontalIndex < BOARDSIZE; horizontalIndex++) {
 
 				$("#game-content div:nth-child(" + (verticalIndex + 1) + ")").append(createCheckBox(verticalIndex, horizontalIndex));
@@ -75,9 +90,9 @@
 			dataX = " data-x='",
 			dataY = " data-y='",
 			label = "<label for='checkbox-" + verticalIndex + "-" + horizontalIndex + "' > </label>";
-		return defaultInput + dataX + verticalIndex + "'" + dataY + horizontalIndex + "' />" + label		
+		return defaultInput + dataY + verticalIndex + "'" + dataX + horizontalIndex + "' />" + label		
 	}
-
+	//function exists at the beggining to create specific board
 	function hidePools(){
 		var medium = Math.floor(BOARDSIZE / 2);
 		for (var i = 0; i < medium; ++i) {

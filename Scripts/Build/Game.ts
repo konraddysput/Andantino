@@ -1,4 +1,3 @@
-
 ///<reference path='../../lib/jquery.d.ts' />
 ///<reference path='Node.ts' />
 ///<reference path='GameStatus.ts' />
@@ -7,18 +6,27 @@ module GameLogic {
 	export class Game {
 		private gameNodes: Node[][];
 		private isGameEnded: boolean;
-
 		private boardSize: number;
 		private gameType: GameStatus;
 		private isPlayerOneMove: boolean 
+		private _hostAddress: string;
+		private _firstMove: boolean;
 
-		constructor(public size: number, public status: GameStatus) {
+		
+		constructor(public size: number, public status: GameStatus, hostAddress: string ) {
 			this.isPlayerOneMove = true;
 			this.boardSize = size;
 			this.isGameEnded = false;
 			this.gameNodes = [];
 			this.gameType = status;		
-			this.InitNodes();	
+			this._hostAddress = hostAddress;
+			this.InitNodes();
+			this._firstMove = true;
+			console.log(this._hostAddress);
+		}
+
+		public EndGame(){
+			this.isGameEnded = true;
 		}
 
 		private InitNodes(){
@@ -31,17 +39,17 @@ module GameLogic {
 		}
 
 		public Move(positionX: number, positionY:number) {
-			var node = NodeStatus.EnemyCheck	 
-
-			if(!this.isPlayerOneMove){
-				node = NodeStatus.PlayerCheck;
+			if (this.isGameEnded){
+				return false;
 			}
+			var node = NodeStatus.PlayerCheck
 			$("input[type='checkbox']:checked[data-x='" + positionX + "'][data-y='" + positionY + "']")
 								.addClass(NodeStatus[NodeStatus.PlayerCheck]);
-			this.gameNodes[positionX][positionY].changeNodeStatus(node);
+			this.gameNodes[positionY][positionX].changeNodeStatus(node);
 
 			switch (this.gameType) {
 				case GameStatus.playerVsBot:
+					this.AddPoints();
 					this.GetAIMove();
 					break;
 				
@@ -50,48 +58,96 @@ module GameLogic {
 					this.isPlayerOneMove = !this.isPlayerOneMove;
 					break;
 			}
-
-			if(!this.isPlayerOneMove)
-			{
-				MainView.nextRound();	
-			}	
 		}
 
-		private GetAIMove(){
-			$("#move-information").slideToggle();
-			this.SendData();
-			//ajax request to api for next move
-			$.ajax({
-				type: "POST",
-				url: "urlToApi",
-				async: false,
-				data: this.SendData(),
-				success: function(data) {
-					//set a new AI move in game table
-					var AIMove = JSON.parse(data);
-					this.SetAIMove(AIMove.X, AIMove.Y);					
-				}
-			});
-			$("#move-information").slideToggle();
+		private AddPoints(){
+			//in a future we should add point after checking a game time
+			var currentScore: number = parseInt($("#current-score").text()),
+				currentTime: number = parseInt($("#minutes").text());
+			currentScore += Math.round(50/(currentTime+1));
+			$("#current-score").text(currentScore);
 		}
-		private SetAIMove(positionX:number, positionY:number){
-			$("input[type='checkbox']:checked[data-x='" + positionX + "'][data-y='" + positionY + "']")
+
+		private GetAIMove() {
+			if (this.isGameEnded) {
+				return false;
+			}
+			$("#move-information").slideToggle();
+			//if this is a first move we dont need to ask server for move position
+			if (this._firstMove){
+				this.MakeFirstMove();
+				$("#move-information").slideToggle();
+			}
+			else{				
+				//ajax request to api for next move
+				//to request data in server we use jsonp because of cross origin resource sharing
+				// function invoked after ajax call have been choosen by Andantino API
+				$.ajax({
+					type: "GET",					
+					dataType: "jsonp",
+					url: this._hostAddress +this.SendData()
+				});
+			}
+		}
+		public SetAIMove(positionY:number, positionX:number){
+			var node = NodeStatus.EnemyCheck;
+			this.gameNodes[positionY][positionX].changeNodeStatus(node);
+			$("input[type='checkbox'][data-x='" + positionX + "'][data-y='" + positionY + "']")
+				.attr("checked", "true")
 				.addClass(NodeStatus[NodeStatus.EnemyCheck]);
 		}
 
 		private SendData(){			
 			var medium = Math.floor(this.boardSize / 2),
-				data = [];
+				data : number[][] = [];
 
 			for (var i = 0; i < this.boardSize; i++) {
-				var currentRow = [];
+				var currentRow : number[] = [];
 				for (var j = 0; j < this.boardSize; j++) {
 					currentRow.push(this.gameNodes[i][j].currentStatus);
 				}
+				console.log(currentRow);
 				data.push(currentRow);
 			}
 
 			return JSON.stringify(data);
+		}
+
+		private MakeFirstMove(){
+			var widthMove : number = this.CheckPossibleWidth(),
+				currentWidth: number = parseInt($("." + NodeStatus[NodeStatus.PlayerCheck]).first().attr("data-x")),
+				heightMove: number = parseInt($("." + NodeStatus[NodeStatus.PlayerCheck]).first().attr("data-y"));
+			
+			this.SetAIMove(heightMove, currentWidth + widthMove);	
+			this._firstMove = false; 
+		}
+		private CheckPossibleWidth():number
+		{			
+			var widthPosition: number = parseInt($("." + NodeStatus[NodeStatus.PlayerCheck]).attr("data-x"));	
+			if(widthPosition ==0){
+				return widthPosition + 1;
+			}
+			else if(widthPosition == 9){
+				return widthPosition - 1;
+			}
+			else{
+				return Math.floor(Math.random() * 10) > 5 ? 1 : -1;
+			}
+		}
+		//not using
+		private CheckPossibleHeight():boolean
+		{
+			var heightPosition : number = parseInt($("." + NodeStatus[NodeStatus.PlayerCheck]).attr("data-y"));
+			if (heightPosition == 0) {
+				return false;
+			}
+			else if (heightPosition == 9) {
+				return true;
+			}
+			else{
+				return Math.floor(Math.random() * 10) > 5;
+			}
+
 		}
 	}
 }

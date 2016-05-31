@@ -1,6 +1,5 @@
 var optionHoveredColorCode = "#780000",
     optionNotHoveredColorCode="#000";
-
 $(function(){
 	initialize();
 });
@@ -8,6 +7,3 @@ $(function(){
 function initialize(){
 	$.material.init();
 }
-
-
-        

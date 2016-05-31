@@ -1,6 +1,5 @@
 ///<reference path="main.ts" />
 
-
 //set button functions and input logic 
 module Enviroment{
 	var TOTALSECOUNDS = 0;
@@ -19,8 +18,7 @@ module Enviroment{
 			}
 		});
 		$("#move").click(function(){
-			debugger;
-			var currentChoice= $("input[type='checkbox']:checked"),
+			var currentChoice = $("input[type='checkbox']:checked:not([class])"),
 				positionX = currentChoice.data("x"),
 				positionY = currentChoice.data("y");
 
@@ -30,7 +28,19 @@ module Enviroment{
 			}
 
 			MainView.nextMove(positionX, positionY);
+			MainView.nextRound();
 		})
+	}
+	export function EndGame(winner: number){
+		// set inputs to unvailable
+		$("input[type=checkbox]").attr("disabled", "true");
+		// show popup with options
+		// set name in popup 
+		var winnerText: string = winner == 2 ?
+								"Grę wygrał gracz " + $("#current-use").text() + " ,Gratulacje!" :
+								"Spróbuj ponownie.";
+		$("#game-winner").text(winnerText);
+		$("#end-game").show();
 	}
 
 	function setTimer() {
@@ -41,7 +51,7 @@ module Enviroment{
 
 	export function setCheckBoxFunctions(){
 		$('input[type="checkbox"]').on('change', function() {
-			$('input[type="checkbox"]').not(this).prop('checked', false);
+			$('input[type="checkbox"]:not([class])').not(this).prop('checked', false);
 		});
 	}
 	
@@ -53,9 +63,7 @@ module Enviroment{
 		$("#user-name").parent().addClass("has-error");
 		return false;
 	}
-
-
-
+	
 	function setTime() {
 		++TOTALSECOUNDS;
 		var minutes = (TOTALSECOUNDS / 60).toString();
