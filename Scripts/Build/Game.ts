@@ -44,7 +44,9 @@ module GameLogic {
 			}
 			var node = NodeStatus.PlayerCheck
 			$("input[type='checkbox']:checked[data-x='" + positionX + "'][data-y='" + positionY + "']")
-								.addClass(NodeStatus[NodeStatus.PlayerCheck]);
+								.addClass(NodeStatus[NodeStatus.PlayerCheck])
+								.attr("disabled","true");
+
 			this.gameNodes[positionY][positionX].changeNodeStatus(node);
 
 			switch (this.gameType) {
@@ -92,9 +94,12 @@ module GameLogic {
 		public SetAIMove(positionY:number, positionX:number){
 			var node = NodeStatus.EnemyCheck;
 			this.gameNodes[positionY][positionX].changeNodeStatus(node);
+			console.log("X: " + positionX);
+			console.log("Y: " + positionY);
 			$("input[type='checkbox'][data-x='" + positionX + "'][data-y='" + positionY + "']")
-				.attr("checked", "true")
-				.addClass(NodeStatus[NodeStatus.EnemyCheck]);
+				.prop("checked", "checked")
+				.addClass(NodeStatus[NodeStatus.EnemyCheck])
+				.attr("disabled", "true");
 		}
 
 		private SendData(){			
@@ -106,7 +111,6 @@ module GameLogic {
 				for (var j = 0; j < this.boardSize; j++) {
 					currentRow.push(this.gameNodes[i][j].currentStatus);
 				}
-				console.log(currentRow);
 				data.push(currentRow);
 			}
 

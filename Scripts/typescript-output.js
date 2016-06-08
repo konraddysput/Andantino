@@ -69,7 +69,8 @@ var GameLogic;
             }
             var node = GameLogic.NodeStatus.PlayerCheck;
             $("input[type='checkbox']:checked[data-x='" + positionX + "'][data-y='" + positionY + "']")
-                .addClass(GameLogic.NodeStatus[GameLogic.NodeStatus.PlayerCheck]);
+                .addClass(GameLogic.NodeStatus[GameLogic.NodeStatus.PlayerCheck])
+                .attr("disabled", "true");
             this.gameNodes[positionY][positionX].changeNodeStatus(node);
             switch (this.gameType) {
                 case GameLogic.GameStatus.playerVsBot:
@@ -112,9 +113,12 @@ var GameLogic;
         Game.prototype.SetAIMove = function (positionY, positionX) {
             var node = GameLogic.NodeStatus.EnemyCheck;
             this.gameNodes[positionY][positionX].changeNodeStatus(node);
+            console.log("X: " + positionX);
+            console.log("Y: " + positionY);
             $("input[type='checkbox'][data-x='" + positionX + "'][data-y='" + positionY + "']")
-                .attr("checked", "true")
-                .addClass(GameLogic.NodeStatus[GameLogic.NodeStatus.EnemyCheck]);
+                .prop("checked", "checked")
+                .addClass(GameLogic.NodeStatus[GameLogic.NodeStatus.EnemyCheck])
+                .attr("disabled", "true");
         };
         Game.prototype.SendData = function () {
             var medium = Math.floor(this.boardSize / 2), data = [];
@@ -123,7 +127,6 @@ var GameLogic;
                 for (var j = 0; j < this.boardSize; j++) {
                     currentRow.push(this.gameNodes[i][j].currentStatus);
                 }
-                console.log(currentRow);
                 data.push(currentRow);
             }
             return JSON.stringify(data);
@@ -183,11 +186,12 @@ var MainView;
             Enviroment.EndGame(move.winner);
             return true;
         }
-        if (move.x % 2 == 1) {
-            move.x = move.x - 1;
+        var positionX = parseInt(move.x), positionY = parseInt(move.y);
+        if (positionX % 2 == 1) {
+            positionX = positionX - 1;
         }
-        move.x = move.x / 2;
-        CURRENTGAME.SetAIMove(move.y, move.x);
+        positionX = positionX / 2;
+        CURRENTGAME.SetAIMove(positionY, positionX);
         $("#move-information").slideToggle();
     }
     MainView.PerformMove = PerformMove;
@@ -261,7 +265,7 @@ var MainView;
 //set button functions and input logic 
 var Enviroment;
 (function (Enviroment) {
-    var TOTALSECOUNDS = 0;
+    var TOTALSECOUNDS = 0, TOTALMOVES = 0;
     function setInputFunctions() {
         $("#solo-game").click(function () {
             if (checkUserData()) {
@@ -304,10 +308,51 @@ var Enviroment;
     }
     function setCheckBoxFunctions() {
         $('input[type="checkbox"]').on('change', function () {
+            var currentPosition = {
+                x: parseInt($(this).attr("data-x")),
+                y: parseInt($(this).attr("data-y"))
+            };
             $('input[type="checkbox"]:not([class])').not(this).prop('checked', false);
+            if (!isMovePossible(currentPosition.x, currentPosition.y) && TOTALMOVES > 1) {
+                $(this).prop('checked', false);
+                return false;
+            }
+            $(this).prop('checked', true);
+            TOTALMOVES++;
         });
     }
     Enviroment.setCheckBoxFunctions = setCheckBoxFunctions;
+    function checkUpperOrLower(xposition, currentY) {
+        var totalMoves = 0, startIndex = xposition - (currentY % 2);
+        if (currentY < 0) {
+            return 0;
+        }
+        else {
+            for (var i = startIndex; i < (startIndex + 2); i++) {
+                if ($("#checkbox-" + currentY + "-" + i).attr("disabled") === "disabled") {
+                    totalMoves++;
+                }
+            }
+            return totalMoves;
+        }
+    }
+    function checkCurrent(xposition, yposition) {
+        var totalMoves = 0;
+        for (var i = xposition - 1; i < (xposition - 1 + 3); i++) {
+            if ($("#checkbox-" + yposition + "-" + i).attr("disabled") === "disabled") {
+                totalMoves++;
+            }
+        }
+        return totalMoves;
+    }
+    function isMovePossible(xposition, yposition) {
+        var possibleMoves = checkUpperOrLower(xposition, yposition - 1);
+        possibleMoves = possibleMoves + checkCurrent(xposition, yposition);
+        possibleMoves = possibleMoves + checkUpperOrLower(xposition, yposition + 1);
+        console.log("Wkoło pionki:" + possibleMoves);
+        return possibleMoves >= 2;
+    }
+    Enviroment.isMovePossible = isMovePossible;
     function checkUserData() {
         if ($("#user-name").val()) {
             $(".current-use").text($("#user-name").val());

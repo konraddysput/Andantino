@@ -23,11 +23,19 @@
 			Enviroment.EndGame(move.winner);
 			return true;
 		}
-		if(move.x%2==1){
-			move.x = move.x- 1;
+		var positionX: number = parseInt(move.x),
+			positionY: number = parseInt(move.y);
+		
+		if (positionX % 2 == 1) {
+			positionX = positionX - 1;
 		}
-		move.x = move.x / 2;
-		CURRENTGAME.SetAIMove(move.y, move.x);
+		positionX = positionX / 2;
+		
+		
+
+		
+
+		CURRENTGAME.SetAIMove(positionY, positionX);
 		$("#move-information").slideToggle();
 	}
 
