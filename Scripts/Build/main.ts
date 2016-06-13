@@ -17,25 +17,21 @@
 		return CURRENTRELAY;
 	}
 
-	export function PerformMove(move: any) {
-		if (move.winner != 0){
-			CURRENTGAME.EndGame();
-			Enviroment.EndGame(move.winner);
-			return true;
-		}
+	export function PerformMove(move: any) {		
 		var positionX: number = parseInt(move.x),
 			positionY: number = parseInt(move.y);
 		
 		if (positionX % 2 == 1) {
 			positionX = positionX - 1;
 		}
-		positionX = positionX / 2;
-		
-		
-
-		
+		positionX = positionX / 2;	
 
 		CURRENTGAME.SetAIMove(positionY, positionX);
+		if (move.winner != 0) {
+			CURRENTGAME.EndGame();
+			Enviroment.EndGame(move.winner);
+			return true;
+		}
 		$("#move-information").slideToggle();
 	}
 

@@ -38,8 +38,8 @@
 						</div>
 					</div>
 					<div class="row col-lg-10 col-lg-offset-1">
-						<input class="btn btn-raised btn-info" type="button" id="duo-game" value="1vs1" />
-						<input class="btn right btn-raised btn-info" type="button" id="solo-game" value="vs AI" />
+						<!--<input class="btn btn-raised btn-info" type="button" id="duo-game" value="1vs1" />-->
+						<input class="btn btn-raised btn-info" style="display:block;margin:0 auto;" type="button" id="solo-game" value="Graj" />
 					</div>
 				</div>
 				<div id="game-content" class="col-lg-8 col-lg-offset-2" style="padding-left:35px">
@@ -84,16 +84,19 @@
 			</div>
 		</div>
 
-		<div id="author-information" class="modal modal-move-position" style="display:none">
+		<div id="author-information" class="modal modal-author-information modal-move-position" style="display:none">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header text-center modal-header-color verticalcenter">
 						<h4 class="modal-title">informacje o autorze</h4>
 					</div>
 					<div class="modal-body text-center">
-						<p>Aplikację przygotował Konrad Dysput</p>
+						<p>Aplikację UI przygotował Konrad Dysput</p>
 						<br />
 						<p>Więcej informacji: konrad.dysput@gmail.com</p>
+					</div>
+					<div class="modal-footer">
+						<input class="btn btn-raised btn-info" style="display:block;margin:0 auto;" type="button" value="OK" onclick="$('#author-information').hide();">
 					</div>
 				</div>
 			</div>
@@ -110,6 +113,9 @@
 						<br />
 						<p>konrad.dysput@gmail.com</p>
 					</div>
+					<div class="modal-footer">
+						<input class="btn btn-raised btn-info" style="display:block;margin:0 auto;" type="button" value="OK" onclick="$('#bug-report').hide();">
+					</div>
 				</div>
 			</div>
 		</div>
@@ -123,11 +129,15 @@
 					<div class="modal-body">
 						<p>Zasady gry:</p>
 						<ul>
-						<li>1. 1</li>
-						<li>2. 2</li>
-						<li>3. 3</li>
-						<li>4. 4</li>
+						<li>Gracz ma do dyspozycję tryb gry Gracz vs Komputer</li>
+						<li>Gracz aby wykonać ruch, musi zaznaczyć wielokąt na polu oraz potwierdzić ruch przyciskiem "Wykonaj"</li>
+						<li>Gracz poza pierwszym ruchem, może oznaczać kolejne wielokąty tylko gdy dany wielokąt będzie styczny z dwoma innymi zaznaczonymi</li>
+						<li>Aby wygrać grę, gracz musi ułożyć 5 wielokątów w pionie lub poziomie</li>
+						<li>Alternatywnym sposobem na wygranie gry jest otoczenie pola przeciwnika wielokątami</li>
 						</ul>
+					</div>
+					<div class="modal-footer">
+						<input class="btn btn-raised btn-info" style="display:block;margin:0 auto;" type="button" value="OK" onclick="$('#game-rules').hide();">
 					</div>
 				</div>
 			</div>

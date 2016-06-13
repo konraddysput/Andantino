@@ -181,17 +181,17 @@ var MainView;
     }
     MainView.getCurrentRelay = getCurrentRelay;
     function PerformMove(move) {
-        if (move.winner != 0) {
-            CURRENTGAME.EndGame();
-            Enviroment.EndGame(move.winner);
-            return true;
-        }
         var positionX = parseInt(move.x), positionY = parseInt(move.y);
         if (positionX % 2 == 1) {
             positionX = positionX - 1;
         }
         positionX = positionX / 2;
         CURRENTGAME.SetAIMove(positionY, positionX);
+        if (move.winner != 0) {
+            CURRENTGAME.EndGame();
+            Enviroment.EndGame(move.winner);
+            return true;
+        }
         $("#move-information").slideToggle();
     }
     MainView.PerformMove = PerformMove;
@@ -349,7 +349,6 @@ var Enviroment;
         var possibleMoves = checkUpperOrLower(xposition, yposition - 1);
         possibleMoves = possibleMoves + checkCurrent(xposition, yposition);
         possibleMoves = possibleMoves + checkUpperOrLower(xposition, yposition + 1);
-        console.log("Wkoło pionki:" + possibleMoves);
         return possibleMoves >= 2;
     }
     Enviroment.isMovePossible = isMovePossible;

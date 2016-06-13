@@ -96,7 +96,6 @@ module Enviroment{
 		var possibleMoves = checkUpperOrLower(xposition, yposition-1);
 		possibleMoves = possibleMoves +checkCurrent(xposition, yposition);
 		possibleMoves = possibleMoves + checkUpperOrLower(xposition, yposition+1);
-		console.log("Wkoło pionki:" + possibleMoves);
 		return possibleMoves >= 2;
 	}
 	
