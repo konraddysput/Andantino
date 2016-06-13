@@ -103,6 +103,7 @@ var GameLogic;
                 //ajax request to api for next move
                 //to request data in server we use jsonp because of cross origin resource sharing
                 // function invoked after ajax call have been choosen by Andantino API
+                console.log(this.SendData());
                 $.ajax({
                     type: "GET",
                     dataType: "jsonp",
